@@ -89,7 +89,7 @@ modules = [
 
 [[package]]
 org = "sameera"
-name = "part1"
+name = "day_02"
 version = "0.1.0"
 dependencies = [
 	{org = "ballerina", name = "io"},
@@ -98,6 +98,6 @@ dependencies = [
 	{org = "ballerinai", name = "observe"}
 ]
 modules = [
-	{org = "sameera", packageName = "part1", moduleName = "part1"}
+	{org = "sameera", packageName = "day_02", moduleName = "day_02"}
 ]
 

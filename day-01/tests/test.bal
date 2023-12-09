@@ -10,7 +10,7 @@ function testSumOfCalibrationValuesWithSampleInput() returns error? {
 
 @test:Config
 function testSumOfCalibrationValuesWithRealInput() returns error? {
-    string[] fileReadLines = check io:fileReadLines("../input.txt");
+    string[] fileReadLines = check io:fileReadLines("input.txt");
     int actualSum = sumOfCalibrationValues(fileReadLines);
     test:assertEquals(actualSum, 54885);
 }
