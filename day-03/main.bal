@@ -1,5 +1,7 @@
 const IGNORE = -1;
-const SYMBOL = -2;
+const OTHER_SYMBOL = -2;
+const STAR_SYMBOL = -3;
+type SYMBOL OTHER_SYMBOL | STAR_SYMBOL;
 
 function part1SumOfAllPartNumbers(string[] lines) returns int {
     int[][] schematic = parseStringInput(lines);
@@ -65,42 +67,42 @@ function partNumber(int row, int col, int[][] schematic) returns boolean {
     int colLength = schematic[row].length();
 
     // Check left
-    if col - 1 >= 0 && schematic[row][col - 1] == SYMBOL {
+    if col - 1 >= 0 && schematic[row][col - 1] is SYMBOL {
         return true;
     }
 
     // Check right
-    if col + 1 < colLength && schematic[row][col + 1] == SYMBOL {
+    if col + 1 < colLength && schematic[row][col + 1] is SYMBOL {
         return true;
     }
 
     // Check up
-    if row - 1 >= 0 && schematic[row - 1][col] == SYMBOL {
+    if row - 1 >= 0 && schematic[row - 1][col] is SYMBOL {
         return true;
     }
     
     // Check down
-    if row + 1 < rowLength && schematic[row + 1][col] == SYMBOL {
+    if row + 1 < rowLength && schematic[row + 1][col] is SYMBOL {
         return true;
     }
 
     // Check up-left
-    if row - 1 >= 0 && col - 1 >= 0 && schematic[row - 1][col - 1] == SYMBOL {
+    if row - 1 >= 0 && col - 1 >= 0 && schematic[row - 1][col - 1] is SYMBOL {
         return true;
     }
 
     // Check up-right
-    if row - 1 >= 0 && col + 1 < colLength && schematic[row - 1][col + 1] == SYMBOL {
+    if row - 1 >= 0 && col + 1 < colLength && schematic[row - 1][col + 1] is SYMBOL {
         return true;
     }
 
     // Check down-left
-    if row + 1 < rowLength && col - 1 >= 0 && schematic[row + 1][col - 1] == SYMBOL {
+    if row + 1 < rowLength && col - 1 >= 0 && schematic[row + 1][col - 1] is SYMBOL {
         return true;
     }
 
     // Check down-right
-    if row + 1 < rowLength && col + 1 < colLength && schematic[row + 1][col + 1] == SYMBOL {
+    if row + 1 < rowLength && col + 1 < colLength && schematic[row + 1][col + 1] is SYMBOL {
         return true;
     }
 
@@ -121,8 +123,12 @@ function parseStringInput(string[] lines) returns int[][] {
                     numbers.push(checkpanic int:fromString(c));
                 }
 
+                "*" => {
+                    numbers.push(STAR_SYMBOL);
+                }
+
                 _ => {
-                    numbers.push(SYMBOL);
+                    numbers.push(OTHER_SYMBOL);
                 }
             }
         }

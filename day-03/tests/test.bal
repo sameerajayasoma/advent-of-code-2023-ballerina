@@ -37,3 +37,18 @@ function dataForNumberFromDigits() returns [int[], int][] {
         [[1, 2, 3, 4, 5, 6, 7, 8, 9], 123456789]
     ];
 }
+
+
+@test:Config
+function testPart1SumOfAllGearsWithSampleInput() returns error? {
+    string[] fileReadLines = check io:fileReadLines("tests/input.txt");
+    int actualSum = part1SumOfAllGears(fileReadLines);
+    test:assertEquals(actualSum, 467835);
+}
+
+@test:Config
+function testPart1SumOfAllGearsWithRealInput() returns error? {
+    string[] fileReadLines = check io:fileReadLines("input.txt");
+    int actualSum = part1SumOfAllGears(fileReadLines);
+    test:assertEquals(actualSum, 78272573);
+}
