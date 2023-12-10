@@ -1,3 +1,12 @@
+const LEFT = 1;
+const RIGHT = 2;
+const UP = 3;
+const DOWN = 4;
+const UP_LEFT = 5;
+const UP_RIGHT = 6;
+const DOWN_LEFT = 7;
+const DOWN_RIGHT = 8;
+
 function part1SumOfAllGears(string[] lines) returns int {
     int[][] schematic = parseStringInput(lines);
     int[] gearRatios = getGearRatios(schematic);
@@ -26,15 +35,6 @@ function getGearRatios(int[][] schematic) returns int[] {
     }
     return gearRatios;
 }
-
-const LEFT = 1;
-const RIGHT = 2;
-const UP = 3;
-const DOWN = 4;
-const UP_LEFT = 5;
-const UP_RIGHT = 6;
-const DOWN_LEFT = 7;
-const DOWN_RIGHT = 8;
 
 function getGearRatio(int row, int col, int[][] schematic) returns int|error {
     int rowLength = schematic.length();
