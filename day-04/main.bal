@@ -13,7 +13,7 @@ function part1TotalPoints(string[] lines) returns int {
         int points = 0;
         foreach var num in card.numbers {
             if card.winningNumMap.hasKey(num) {
-                poingitts = points == 0 ? 1 : points * 2;
+                points = points == 0 ? 1 : points * 2;
             }
         }
         totalPoints += points;
