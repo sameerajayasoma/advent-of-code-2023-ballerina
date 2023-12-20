@@ -1,4 +1,10 @@
 import ballerina/lang.regexp;
+import ballerina/io;
+
+type SeedRange record {|
+    int rStart;
+    int lengh;
+|};
 
 type Range record {|
     int srcStart;
@@ -10,7 +16,7 @@ type Range record {|
 type CategoryMap record {|
     string src;
     string dest;
-    Range[] ranges = [];
+    Range[] ranges;
 |};
 
 final regexp:RegExp colonRegex = re `:`;
@@ -22,21 +28,100 @@ function part1LowestLocation(string[] lines) returns int {
     int[] seeds = strToIntArray(seedsLine);
 
     CategoryMap[] categoryMaps = getCategoryMaps(lines);
-    int[] locationNumbers = [];
+    int minLocationNum = int:MAX_VALUE;
     foreach int seed in seeds {
-        int destNumber = seed;
-        foreach var categoryMap in categoryMaps {
-            destNumber = findDestNumber(destNumber, categoryMap);
+        int destNumber = findDestNumberForSeed(seed, categoryMaps);
+        if destNumber < minLocationNum {
+            minLocationNum = destNumber;
         }
-        locationNumbers.push(destNumber);
     }
+    return minLocationNum;
+}
 
-    return getMin(locationNumbers);
+function part2LowestLocation(string[] lines) returns int {
+    string seedsLine = lines[0].substring(7);
+    SeedRange[] seedRanges = getSeedRanges(strToIntArray(seedsLine));
+    CategoryMap[] categoryMaps = getCategoryMaps(lines);
+
+    int minLocationNum = int:MAX_VALUE;
+    foreach SeedRange seedRange in seedRanges {
+        io:println(seedRange);
+        int destNumber = findMinLocationSeedRange(seedRange.rStart, seedRange.lengh, categoryMaps);
+        if destNumber < minLocationNum {
+            minLocationNum = destNumber;
+        }
+    }
+    return minLocationNum;
+}
+
+function getSeedRanges(int[] seedLineNumbers) returns SeedRange[] {
+    SeedRange[] seedRanges = [];
+    int index = 0;
+    while (index < seedLineNumbers.length()) {
+        SeedRange seedRange = {rStart: seedLineNumbers[index], lengh: seedLineNumbers[index + 1]};
+        seedRanges.push(seedRange);
+        index += 2;
+    }
+    return seedRanges;
+}
+
+function findMinLocationSeedRange(int seed, int seedLength, CategoryMap[] categoryMaps) returns int {
+    int seedStart = seed;
+    int minLocationNum = int:MAX_VALUE;
+    int seedEnd = seed + seedLength;
+    int catLength = categoryMaps.length();
+
+    while (seedStart < seedEnd) {
+        int destNumber = seedStart;
+        
+        int categoryIndex = 0;
+        while (categoryIndex < catLength) {
+            CategoryMap categoryMap = categoryMaps[categoryIndex];
+            int rangeLength = categoryMap.ranges.length();
+            int rangeIndex = 0;
+            while (rangeIndex < rangeLength) {
+                Range range = categoryMap.ranges[rangeIndex];
+                if (destNumber >= range.srcStart && destNumber <= range.srcEnd) {
+                    int diff = destNumber - range.srcStart;
+                    destNumber = range.destStart + diff;
+                    break;
+                }
+                rangeIndex += 1;
+            }
+
+
+            categoryIndex += 1;
+        }
+
+        // foreach var categoryMap in categoryMaps {
+        //     // foreach Range range in categoryMap.ranges {
+        //     //     if (destNumber >= range.srcStart && destNumber <= range.srcEnd) {
+        //     //         int diff = destNumber - range.srcStart;
+        //     //         destNumber = range.destStart + diff;
+        //     //         break;
+        //     //     }
+        //     // }
+        // }
+
+        if destNumber < minLocationNum {
+            minLocationNum = destNumber;
+        }
+        seedStart += 1;
+    }
+    return minLocationNum;
+}
+
+function findDestNumberForSeed(int seed, CategoryMap[] categoryMaps) returns int {
+    int destNumber = seed;
+    foreach var categoryMap in categoryMaps {
+        destNumber = findDestNumber(destNumber, categoryMap);
+    }
+    return destNumber;
 }
 
 function findDestNumber(int srcNumber, CategoryMap categoryMap) returns int {
     foreach Range range in categoryMap.ranges {
-        if inSourceRange(srcNumber, range) {
+        if (srcNumber >= range.srcStart && srcNumber <= range.srcEnd) {
             int diff = srcNumber - range.srcStart;
             return range.destStart + diff;
         }
@@ -45,30 +130,22 @@ function findDestNumber(int srcNumber, CategoryMap categoryMap) returns int {
     return srcNumber;
 }
 
-function inSourceRange(int number, Range range) returns boolean {
-    return inRange(number, range.srcStart, range.srcEnd);
-}
-
-function inRange(int number, int rStart, int rEnd) returns boolean {
-    return number >= rStart && number <= rEnd;
-}
-
 function getCategoryMaps(string[] lines) returns CategoryMap[] {
     CategoryMap[] categoryMaps = [];
     int index = 2;
     while (index < lines.length()) {
         string mapStartLine = lines[index].substring(0, lines[index].length() - 5);
         string[] srcToDest = dashRegex.split(mapStartLine);
-        CategoryMap categoryMap = {src: srcToDest[0], dest: srcToDest[2]};
-        categoryMaps.push(categoryMap);
         Range[] ranges = [];
-        categoryMap.ranges = ranges;
         index += 1;
         while (index < lines.length() && lines[index] != "") {
             int[] rangeNumbers = strToIntArray(lines[index]);
-            ranges.push(getRange(rangeNumbers));
+            Range range = getRange(rangeNumbers);
+            ranges.push(range);
             index += 1;
         }
+        CategoryMap categoryMap = {src: srcToDest[0], dest: srcToDest[2], ranges: ranges};
+        categoryMaps.push(categoryMap);
         index += 1;
     }
     return categoryMaps;
@@ -91,21 +168,5 @@ function strToIntArray(string str) returns int[] {
         result.push(num);
     }
     return result;
-}
-
-function getMin(int[] numbers) returns int {
-    if numbers.length() == 1 {
-        return numbers[0];
-    } else {
-        int min = numbers[0];
-        int index = 1;
-        while (index < numbers.length()) {
-            if numbers[index] < min {
-                min = numbers[index];
-            }
-            index += 1;
-        }
-        return min;
-    }
 }
 
